@@ -1,0 +1,5 @@
+{
+  "test_infura_http": "REPLACE-WITH-YOUR-API",
+  "test_alchemy_http": "REPLACE-WITH-YOUR-API",
+  "test_infura_ws": "REPLACE-WITH-YOUR-API"
+}
