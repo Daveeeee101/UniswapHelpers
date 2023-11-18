@@ -108,7 +108,6 @@ class HTTPRPCConnection:
         async with self.http_connection.post(self.http_url, json=batch) as resp:
             response = await resp.json()
             out = []
-            print(batch, response)
             for batch_req, (index, r) in zip(batch_list, enumerate(response)):
                 if batch[index]['id'] != r['id']:
                     raise Batch_Error()

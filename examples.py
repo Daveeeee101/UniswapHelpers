@@ -29,25 +29,31 @@ async def get_a_single_uniswap_v2_and_v3_pool() -> Tuple[UniswapV2LP, UniswapV3L
         block_number_to_get_pool_info_for = 18566245
 
         v2_lp = await mgr.get_uniswap_v2_liquidity_pool(lp_address_v2, block_number_to_get_pool_info_for)
-        v3_lp = await mgr.get_uniswap_v3_liquidity_pool(lp_address_v3, block_number_to_get_pool_info_for)
+        v3_lp = await mgr.get_uniswap_v3_liquidity_pool(lp_address_v3, number_of_ticks=20, block_number=block_number_to_get_pool_info_for)
         # ------------------
 
         # ------------------
         # PRINT OUT SOME POOL INFO
         print(f"v2 lp reserves = {v2_lp.get_reserves()}")
-        weth_out_for_usdc = v2_lp.simulate_swap(1_000_000, 0)  # be careful here with which token is token0 and which is token1
-        print(f"swapping 1,000,000 USDC yields {weth_out_for_usdc} WETH")  # recall that we don't care about decimals so these are large numbers
-        print(f"Current v2 price is: {v2_lp.get_price()}")
+        weth_out_for_usdc = v2_lp.simulate_swap(10_000_000_000_000, 0)  # be careful here with which token is token0 and which is token1
+        print(f"swapping 10,000,000 USDC yields {weth_out_for_usdc / 1e18} WETH")  # recall that we don't care about decimals so these are large numbers
+        print(f"Current v2 price is: {(cur_price := v2_lp.get_price())}")
 
-        v2_price_after_swap = v3_lp.simulate_swap_price(1_000_000, 0)
+        v2_price_after_swap = v2_lp.simulate_swap_price(10_000_000_000_000, 0)
         print(f"v2 price after swap is: {v2_price_after_swap}")
 
-        print(f"v3 lp liquidity = {v3_lp.liquidity}, current tick = {v3_lp.current_tick}")
-        weth_out_for_usdc = v3_lp.simulate_swap(1_000_000, 0)  # be careful here with which token is token0 and which is token1
-        print(f"swapping 1,000,000 USDC yields {weth_out_for_usdc} WETH")  # recall that we don't care about decimals so these are large numbers
+        print(f"v2 price impact was: {1 - (v2_price_after_swap / cur_price)}")
 
-        v3_price_after_swap = v3_lp.simulate_swap_price(1_000_000, 0)
-        print(f"v3 price after swap is: {v3_price_after_swap}")
+        print(f"v3 lp liquidity = {v3_lp.liquidity}, current tick = {v3_lp.current_tick}")
+        weth_out_for_usdc = v3_lp.simulate_swap(10_000_000_000_000, 0)  # be careful here with which token is token0 and which is token1
+        print(f"swapping 10,000,000 USDC yields {weth_out_for_usdc / 1e18} WETH")  # recall that we don't care about decimals so these are large numbers
+
+        print(f"v3 price before swap was: {(cur_price := v3_lp.get_price())}")
+
+        v3_price_after_swap = v3_lp.simulate_swap_price(10_000_000_000_000, 0)
+        print(f"v3 price after swap is: {(v3_price_after_swap  ** 2 / 2 ** 192)}")
+
+        print(f"v3 price impact was: {1 - ((v3_price_after_swap  ** 2 / 2 ** 192) / cur_price)}")
         # ------------------
 
         return v2_lp, v3_lp

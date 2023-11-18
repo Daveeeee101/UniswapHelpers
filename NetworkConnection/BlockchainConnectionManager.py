@@ -252,6 +252,7 @@ class BlockchainConnectionManager:
                     break
                 index_upper = 0
                 current_bitmap_upper += 1
+
             if len(ticks_to_get) < number_of_ticks and previous_len != len(ticks_to_get):
                 min_bitmap = min(bitmap_dict.keys())
                 max_bitmap = max(bitmap_dict.keys())
